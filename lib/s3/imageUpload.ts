@@ -41,7 +41,7 @@ export default async function imageUpload(imageUploadingDetail: ImageUploadingDe
 
   const imageTypeExt = await getImageTypeExt(base64Image);
   const dateNow = moment();
-  const keyName = `nutri-image/${section}/${dateNow}/${uuidv4()}.${imageTypeExt}`;
+  const keyName = `nutritionist-image/${section}/${dateNow}/${uuidv4()}.${imageTypeExt}`;
   const params = {
     Bucket: process.env.BUCKET as string,
     Body: base64Image,
