@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MedicalReport {
+  id                       String                    @id @default(dbgenerated("concat('med_rpt_', nextval('medical_report_id_seq'::regclass))"))
+  gender                   String                    @db.VarChar(6)
+  height                   Int
+  weight                   Int
+  waistCircumference       Int?
+  bodyMassIndex            Decimal?                  @db.Decimal(5, 1)
+  comment                  String?
+  firstName                String                    @db.VarChar(100)
+  lastName                 String                    @db.VarChar(100)
+  clientProfileId          String
+  createdAt                DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                  @updatedAt @db.Timestamptz(6)
+  bloodPressure            BloodPressure?
+  bloodTest                BloodTest?
+  bloodType                BloodType?
+  eyesight                 Eyesight?
+  hearing                  Hearing?
+  hepatitis                Hepatitis?
+  kidneyFunction           KidneyFunction?
+  lipidMetabolism          LipidMetabolism?
+  liverGallbladderFunction LiverGallbladderFunction?
+  clientProfile            ClientProfile             @relation(fields: [clientProfileId], references: [id])
+  stoolExamination         StoolExamination?
+  sugarMetabolism          SugarMetabolism?
+  urineGlucose             UrineGlucose?
+}
+
+model BloodPressure {
+  id                         String        @default(dbgenerated("concat('bld_prs_', nextval('blood_pressure_id_seq'::regclass))"))
+  highestBloodPressure       Int?
+  lowestBloodPressure        Int?
+  highestBloodPressureSecond Int?
+  medicalReportId            String        @unique
+  lowestBloodPressureSecond  Int?
+  medicalReport              MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model Eyesight {
+  id                 String        @id @default(dbgenerated("concat('eye_st_', nextval('eyesight_id_seq'::regclass))"))
+  leftEye            Decimal?      @db.Decimal(5, 1)
+  rightEye           Decimal?      @db.Decimal(5, 1)
+  medicalReportId    String        @unique
+  leftEyeCorrection  Decimal?      @db.Decimal(5, 1)
+  rightEyeCorrection Decimal?      @db.Decimal(5, 1)
+  medicalReport      MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model BloodType {
+  id              String        @id @default(dbgenerated("concat('bld_type_', nextval('blood_type_id_seq'::regclass))"))
+  type            String?       @db.Char(1)
+  Rh              String?       @db.Char(1)
+  medicalReportId String        @unique
+  medicalReport   MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model Hearing {
+  id              String        @id @default(dbgenerated("concat('hearing_', nextval('hearing_id_seq'::regclass))"))
+  leftEar1000hz   String?       @db.VarChar(20)
+  rightEar1000hz  String?       @db.VarChar(20)
+  medicalReportId String        @unique
+  leftEar4000hz   String?       @db.VarChar(20)
+  rightEar4000hz  String?       @db.VarChar(20)
+  medicalReport   MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model UrineGlucose {
+  id                      String        @id @default(dbgenerated("concat('uri_glu_', nextval('uri_glu_seq'::regclass))"))
+  urineGlucoseQualitative String?       @db.VarChar(3)
+  urineProteinQualitative String?       @db.VarChar(3)
+  uricBlood               String?       @db.VarChar(3)
+  urobilinogenQualitative String?       @db.VarChar(3)
+  medicalReportId         String        @unique
+  medicalReport           MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model StoolExamination {
+  id                  String        @id @default(dbgenerated("concat('stl_exm_', nextval('stl_exm_seq'::regclass))"))
+  fecalOccultBloodLA1 String?       @db.Char(1)
+  fecalOccultBloodLA2 String?       @db.Char(1)
+  medicalReportId     String        @unique
+  medicalReport       MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model BloodTest {
+  id                                     String        @id @default(dbgenerated("concat('bld_tst_', nextval('bld_tst_seq'::regclass))"))
+  whiteBloodCellCount                    Decimal?      @db.Decimal(5, 1)
+  redBloodCellCount                      Int?
+  hemoglobinContent                      Decimal?      @db.Decimal(5, 1)
+  hematocrit                             Decimal?      @db.Decimal(5, 1)
+  meanCorpuscularVolume                  Decimal?      @db.Decimal(5, 1)
+  meanCorpuscularHemoglobin              Decimal?      @db.Decimal(5, 1)
+  meanCorpuscularHemoglobinConcentration Decimal?      @db.Decimal(5, 1)
+  bloodPlateletCount                     Decimal?      @db.Decimal(5, 1)
+  medicalReportId                        String        @unique
+  medicalReport                          MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model LiverGallbladderFunction {
+  id                          String        @id @default(dbgenerated("concat('lvr_gal_fun_', nextval('lvr_gal_fun_seq'::regclass))"))
+  aspartateAminotransferase   Int?
+  alanineTransaminase         Int?
+  gammaGlutamylTranspeptidase Int?
+  alkalinePhosphatase         Int?
+  lactateDehydrogenase        Int?
+  totalBilirubin              Decimal?      @db.Decimal(5, 1)
+  totalProtein                Decimal?      @db.Decimal(5, 1)
+  albumin                     Decimal?      @db.Decimal(5, 1)
+  albuminGlobulinRatio        Decimal?      @db.Decimal(5, 1)
+  medicalReportId             String        @unique
+  medicalReport               MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model LipidMetabolism {
+  id               String        @id @default(dbgenerated("concat('lip_meta_', nextval('lip_meta_seq'::regclass))"))
+  naturalFat       Int?
+  totalCholesterol Int?
+  hdLCholesterol   Int?
+  nonHdl           Int?
+  ldLCholesterol   Int?
+  medicalReportId  String        @unique
+  medicalReport    MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model KidneyFunction {
+  id                                String        @id @default(dbgenerated("concat('kdy_fun_', nextval('kdy_fun_seq'::regclass))"))
+  ureaNitrogen                      Decimal?      @db.Decimal(5, 1)
+  creatinine                        Decimal?      @db.Decimal(5, 2)
+  uricAcid                          Decimal?      @db.Decimal(5, 1)
+  estimatedGlomerularFiltrationRate Decimal?      @db.Decimal(5, 1)
+  medicalReportId                   String        @unique
+  medicalReport                     MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model SugarMetabolism {
+  id              String        @id @default(dbgenerated("concat('sgr_meta_', nextval('sgr_meta_seq'::regclass))"))
+  bloodSugar      Decimal?      @db.Decimal(5, 1)
+  hba1c           Decimal?      @db.Decimal(5, 1)
+  medicalReportId String        @unique
+  medicalReport   MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model Hepatitis {
+  id                       String        @id @default(dbgenerated("concat('hps_', nextval('hps_seq'::regclass))"))
+  hepatitisBSurfaceAntigen String?       @db.Char(1)
+  antiHepatitisBSerologic  String?       @db.Char(1)
+  hepatitisCAntibody       String?       @db.Char(1)
+  medicalReportId          String        @unique
+  medicalReport            MedicalReport @relation(fields: [medicalReportId], references: [id])
+}
+
+model ClientProfile {
+  id             String          @id @default(dbgenerated("concat('clt_pfl_', nextval('clt_pfl_seq'::regclass))"))
+  firstName      String          @db.VarChar(100)
+  lastName       String          @db.VarChar(100)
+  dob            DateTime        @db.Date
+  age            Int
+  emailAddress   String          @unique @db.VarChar(200)
+  phoneNumber    String          @db.VarChar(13)
+  address        String          @db.VarChar(200)
+  createdAt      DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime        @updatedAt @db.Timestamptz(6)
+  nutritionistId String?
+  Appointment    Appointment[]
+  nutritionist   Nutritionist?   @relation(fields: [nutritionistId], references: [id])
+  MedicalReport  MedicalReport[]
+}
+
+model Nutritionist {
+  id            String          @id @default(dbgenerated("concat('ntr_', nextval('nutritionist_id_seq'::regclass))"))
+  firstName     String          @db.VarChar(100)
+  lastName      String          @db.VarChar(100)
+  dob           DateTime        @db.Date
+  age           Int
+  emailAddress  String          @unique @db.VarChar(200)
+  phoneNumber   String?         @db.VarChar(13)
+  address       String?         @db.VarChar(200)
+  education     String?         @db.VarChar(200)
+  cirtificate   String?         @db.VarChar(200)
+  avatarColor   String?         @db.VarChar(15)
+  imageUrl      String?         @db.VarChar(500)
+  createdAt     DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime        @updatedAt @db.Timestamptz(6)
+  userId        String          @unique
+  imageId       String?         @db.VarChar(200)
+  ClientProfile ClientProfile[]
+  user          User            @relation(fields: [userId], references: [id])
+}
+
+model Admin {
+  id           String   @id @default(dbgenerated("concat('adm_', nextval('admin_id_seq'::regclass))"))
+  firstName    String   @db.VarChar(100)
+  lastName     String   @db.VarChar(100)
+  dob          DateTime @db.Date
+  age          Int
+  emailAddress String   @unique @db.VarChar(200)
+  phoneNumber  String?  @db.VarChar(13)
+  address      String?  @db.VarChar(200)
+  avatarColor  String?  @db.VarChar(15)
+  imageUrl     String?  @db.VarChar(500)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  userId       String   @unique
+  imageId      String?  @db.VarChar(200)
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id           String        @id @default(dbgenerated("concat('user_', nextval('user_id_seq'::regclass))"))
+  emailAddress String        @unique @db.VarChar(200)
+  password     String        @db.VarChar(30)
+  role         Role
+  active       Boolean?
+  createdAt    DateTime      @default(now()) @db.Timestamptz()
+  updatedAt    DateTime      @updatedAt @db.Timestamptz()
+  deletedAt    DateTime      @db.Timestamptz()
+  Admin        Admin?
+  Nutritionist Nutritionist?
+}
+
+model Appointment {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title           String        @db.VarChar(100)
+  date            DateTime      @db.Date
+  time            DateTime      @db.Timestamptz(6)
+  description     String
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @db.Timestamptz(6)
+  clientProfileId String
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+}
+
+enum Role {
+  Admin
+  Nutritionist
+}
